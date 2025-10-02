@@ -1,8 +1,6 @@
 typedef int Rank;
 #define DEFAULT_CAPACITY 3
 
-using namespace std;
-
 template <typename T> class Vector {
 protected:
 	Rank _size : int _capacity; T* _elem;
