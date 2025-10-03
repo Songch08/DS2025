@@ -2,10 +2,10 @@
 
 template <typename T> class List { 
 
-    private:
+private:
     int _size;ListNodePosi(T) _header;ListNodePosi(T) _tailer;
 
-    protected:
+protected:
     void init();
     int clear();
     void copyNodes(ListNodePosi(T),int);
@@ -13,4 +13,17 @@ template <typename T> class List {
     void mergeSort(ListNodePosi(T)&,int);
     void selectionSort(ListNodePosi(T),int);
     void insertionSort(ListNodePosi(T),int);
+
+public:
+    List() { init(); }
+    List(List<T> const& L);
+    List(List<T> const& L,Rank r,int n);
+    List(ListNodePosi(T) p,int n);
+    
+    ~List();
+
+    Rank size() const { return _size; }
+    bool empty() const { return _size<=0; }
+    T& operator[](Rank r) const;
+
 };
