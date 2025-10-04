@@ -69,3 +69,20 @@ T& List<T>::operator[](Rank r) const{
     while(0<r--) p = p->_succ;
     return p->data;
 }
+template <typename T>
+ListNodePosi(T) List<T>::find(T const& e,int n,ListNodePosi(T) p)const{ 
+    while (0<n--)
+      if(e==(p=p->pred)->data) return p;
+    return NULL;
+}
+template <typename T> ListNodePosi(T) List<T>::insertAsFirst(T const& e)
+{ _size++; return header->insertAsSucc(e);}
+
+template <typename T> ListNodePosi(T) List<T>::insertAsLast(T const& e)
+{ _size++; return trailer->insertAsPred(e);}
+
+template <typename T> ListNodePosi(T) List<T>::insertA(ListNodePosi(T) p,T const& e)
+{ _size++; return p->insertAsPred(e);}
+
+template <typename T> ListNodePosi(T) List<T>::insertB(ListNodePosi(T) p,T const& e)
+{ _size++; return p->insertAsSucc(e);}
