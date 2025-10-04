@@ -15,6 +15,7 @@ protected:
     void insertionSort(ListNodePosi(T),int);
 
 public:
+
     List() { init(); }
     List(List<T> const& L);
     List(List<T> const& L,Rank r,int n);
@@ -23,7 +24,6 @@ public:
     ~List();
 
     Rank size() const { return _size; }
-
     bool empty() const { return _size<=0; }
     T& operator[](Rank r) const;
     ListNodePosi(T) first() const { return _header->_succ; }
@@ -40,6 +40,19 @@ public:
     ListNodePosi(T) selectMax(ListNodePosi(T) p,int n);
     ListNodePosi(T) selectMax() { return selectMax(header->succ,_size); }
     
+    ListNodePosi(T) insertAsFirst(T const& e);
+    ListNodePosi(T) insertAsLast(T const& e);
+    ListNodePosi(T) insertA(ListNodePosi(T) p,T const& e);
+    ListNodePosi(T) insertB(ListNodePosi(T) p,T const& e);
+    T remove(ListNodePosi(T) p);
+    void merge(List<T>& L){ merge(first(), size,L,L.first(),L._size); }
+    void sort(ListNodePosi(T) p,int n);
+    void sort() { sort(first(),_size); }
+    int deduplicate()
+    int uniquify();
+    void reverse();
 
-
+    void traverse(void (*)(T&));
+    template <typename VST> 
+    void traverse(VST&);
 };
