@@ -86,3 +86,57 @@ template <typename T> ListNodePosi(T) List<T>::insertA(ListNodePosi(T) p,T const
 
 template <typename T> ListNodePosi(T) List<T>::insertB(ListNodePosi(T) p,T const& e)
 { _size++; return p->insertAsSucc(e);}
+template<typename T>
+ListNodePosi(T) ListNode<T>::insertAsPred(T const& e){
+    ListNodePosi(T) x = new ListNode(e,pred,this);
+    pred->_succ = x;pred = x;
+    return x;
+}
+template <typename T>
+ListNodePosi(T) ListNode<T>::insertAsSucc(T const& e){
+    ListNodePosi(T) x = new ListNode(e,this,succ);
+    succ->_pred = x;succ = x;
+    return x;
+}
+template <typename T>
+void List<T>::copyNodes(ListNodePosi(T) p,int n){ 
+    init();
+    while(n--) {insertAsLast(p->data);p = p->_succ;}
+}
+template <typename T>
+List<T>::List(ListNodePosi(T) p,int n){ copyNodes(p,n);}
+
+template <typename T>
+List<T>::List(List<T> const& L){ copyNodes(L.first(),L._size());}
+
+template <typename T>
+List<T>::List(List<T> const& L,int r,int n){ copyNodes(L[r],n);}
+template <typename T> T List<T>::remove(ListNodePosi(T) p){ 
+    T e = p->data;
+    p->_pred->_succ = p->_succ;p->_succ->_pred = p->_pred;
+    delete p;_size--;
+    return e;
+}
+template <typename T> List<T>::~List()
+{ clear();delete header;delete trailer;}
+template <typename T> int List<T>::clear(){ 
+    int oldSize = _size;
+    while(0<_size) remove(header->_succ);
+    return oldSize;
+}
+template <typename T> int List<T>::deduplicate(){
+    if(_size<2) return 0;
+    int oldSize = _size;
+    ListNodePosi(T) p = header;Rank r = 0;
+    while(trailer != (p = p->_succ)){
+        ListNodePosi(T) q = find(p->data,r,p);
+        q?remove(q):r++;
+    }
+    return oldSize-_size;
+}
+template <typename T> void List<T>::traverse (void(*visit)(T*))
+{ for (ListNodePosi(T) p=header->_succ;p!=trailer;p=p->_succ) visit(&p->data);}
+
+template <typename T> template <typename VST>
+void List<T>::traverse(VST& visit)
+{ for (ListNodePosi(T) p=header->_succ;p!=trailer;p=p->_succ) visit(p->data);}
