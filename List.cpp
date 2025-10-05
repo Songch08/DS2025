@@ -36,7 +36,7 @@ public:
     ListNodePosi(T) find (T const& e,int n,ListNodePosi(T) p)const;
     ListNodePosi(T) search(T const& e) const
     {return search(e,_size,trailer);}
-    ListNodePosi search(T const& e,int n,ListNodePosi(T) p)const;
+    ListNodePosi(T) search(T const& e,int n,ListNodePosi(T) p)const;
     ListNodePosi(T) selectMax(ListNodePosi(T) p,int n);
     ListNodePosi(T) selectMax() { return selectMax(header->succ,_size); }
     
@@ -48,7 +48,7 @@ public:
     void merge(List<T>& L){ merge(first(), size,L,L.first(),L._size); }
     void sort(ListNodePosi(T) p,int n);
     void sort() { sort(first(),_size); }
-    int deduplicate()
+    int deduplicate();
     int uniquify();
     void reverse();
 
@@ -134,9 +134,31 @@ template <typename T> int List<T>::deduplicate(){
     }
     return oldSize-_size;
 }
-template <typename T> void List<T>::traverse (void(*visit)(T*))
+template <typename T> void List<T>::traverse (void(*visit)(T&))
 { for (ListNodePosi(T) p=header->_succ;p!=trailer;p=p->_succ) visit(&p->data);}
 
 template <typename T> template <typename VST>
 void List<T>::traverse(VST& visit)
 { for (ListNodePosi(T) p=header->_succ;p!=trailer;p=p->_succ) visit(p->data);}
+template <typename T> int List<T>::uniquify(){
+    if(_size<2) return 0;
+    int oldSize = _size;
+    ListNodePosi(T) p = first();ListNodePosi(T) q;
+    while(trailer != (p = p->_succ))
+        if( p->data!=q->data) p=q;
+        else remove(q);
+    return oldSize-_size;
+}
+template <typename T>
+ListNodePosi(T) List<T>::search(T const& e,int n,ListNodePosi(T) p)const{ 
+    while(0<n--)
+      if(((p=p->_pred)->data)<=e) break; 
+    return p;
+}
+template <typename T> void List<T>::sort(ListNodePosi(T) p, int n){
+    switch (rand()%3){
+       case 1: insertionSort(p,n);break;
+       case 2: selectionSort(p,n);break;
+       default: mergeSort(p,n);break;
+    }
+}
