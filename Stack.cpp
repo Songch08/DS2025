@@ -1,16 +1,24 @@
-#include "Vector.h"      
-#include <cctype>
-#include <cstdint>
-#include <cstdlib>
-#include <vector>
+#include "Stack.h"
 #include <iostream>
+#include <cctype>
+#include <cmath>
+#include <cstdlib>
+using namespace std;
 
-template<typename T> class Stack : public Vector<T> {
-public:
-    void push(T const& e) { insert(size(), e);}
-    T pop() {return remove(size()-1);}
-    T& top(){return (*this)[size()-1];}
-};
+template <typename T>
+void readNumber(char*& p, Stack<T>& stk)
+{
+    stk.push((T)(*p - '0'));           
+    while (isdigit(*(++p)))            
+        stk.top() = 10 * stk.top() + (*p - '0');
+    if ('.' != *p) return;           
+
+    float fraction = 1;
+    while (isdigit(*(++p))) {          
+        fraction /= 10;
+        stk.top() += (*p - '0') * fraction;
+    }
+}
 void convert(Stack<int>& S, _int64 n,int base) {
     static char digits[] 
     = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
@@ -58,6 +66,62 @@ const char pri[N_OPTR][N_OPTR]={
 /* -- ) */ ' ',' ',' ',' ',' ',' ',' ',' ',' ',
 /* -- \0 */ '<','<','<','<','<','<','<',' ','='
 };
+Operator optr2rank(char op)
+{
+    switch (op) {
+    case '+': return ADD;
+    case '-': return SUB;
+    case '*': return MUL;
+    case '/': return DIV;
+    case '^': return POW;
+    case '!': return FAC;
+    case '(': return L_P;
+    case ')': return R_P;
+    case '\0': return EOE;
+    default:  exit(-1);
+    }
+}
+char orderBetween(char op1, char op2)
+{
+    return pri[optr2rank(op1)][optr2rank(op2)];
+}
+
+float calcu(char op, float n)
+{
+    switch (op) {
+    case '!': {
+        float r = 1;
+        for (int i = 1; i <= (int)n; i++) r *= i;
+        return r;
+    }
+    default: exit(-1);
+    }
+}
+
+float calcu(float a, char op, float b)
+{
+    switch (op) {
+    case '+': return a + b;
+    case '-': return a - b;
+    case '*': return a * b;
+    case '/': return a / b;
+    case '^': return pow(a, b);
+    default: exit(-1);
+    }
+}
+
+void append(char*& RPN, float opnd)
+{
+    char buf[32];
+    sprintf(buf, "%.2f ", opnd);
+    while (*buf) *RPN++ = *buf++;
+}
+
+void append(char*& RPN, char op)
+{
+    *RPN++ = op;
+    *RPN++ = ' ';
+}
 float evaluate ( char*S,char*& RPN){
     Stack<float> opnd;Stack<char> optr;
     optr.push('\0');
@@ -87,84 +151,4 @@ float evaluate ( char*S,char*& RPN){
         }
     }
     return opnd.top();
-}
-struct Queen{
-    int x,y;
-    Queen(int xx=0,int yy=0):x(xx),y(yy){};
-    bool operator==(Queen const& q) const{
-        return (x==q.x)
-                ||(y==q.y)
-                ||(x+y==q.x+q.y)
-                ||(x-y==q.x-q.y);
-    }
-    bool operator!=(Queen const& q) const {return !(*this==q);}
-}
-void placeQueens( int N){
-    Stack<Queen> solu;
-    Queen q(0,0);
-    do{
-        if (N<=solu.size()||N<=q.){
-            q=solu.pop();q.y++;
-        }else{
-            while((q.y<N)&&(0<=solu.find(q)))
-            {q.y++;nCheck++;}
-            if(N>=q.y){
-                solu.push(q);
-                if(N<=solu.size())nSolu++;
-                q.x++;q.y=0;
-            }
-        }
-    }while ((0<q.x)||(q.y<N));
-}
-typedef enum {AVAILABLE,ROUTE,BACKTRACKED,WALL }Status;
-
-typedef enum {UNKNOWN,EAST,SOUTH,WEST,NORTH,NO_WAY}ESWN
-
-inline ESWN nextESWN(ESWN eswn){return ESWN(eswn+1);}
-
-struct Cell{
-    int x,y;Status status;
-    ESWN incoming,outgoing;
-};
-
-#define LABY_MAX 24
-Cell laby[LABY_MAX][LABY_MAX];
-
-inline Cell*neighbor(Cell*cell){
-    switch(cell->outgoing){
-        case EAST:return cell+LABY_MAX;
-        case SOUTH:return cell+1;
-        case WEST:return cell-LABY_MAX;
-        case NORTH:return cell-1;
-        default:return NULL;
-    } 
-}
-
-inline Cell*advence(Cell*cell){ 
-    Cell*next;
-    switch(cell->outgoing){
-        case EAST:next=cell+LABY_MAX;   next->incoming=WEST;break;
-        case SOUTH:next=cell+1;         next->incoming=NORTH;break;
-        case WEST:next=cell-LABY_MAX;   next->incoming=EAST;break;
-        case NORTH:next=cell-1;         next->incoming=SOUTH;break;
-        default:exit(-1);
-    }
-    return next;
-}
-
-bool labyrinth(Cell Laby[LABY_MAX][LABY_MAX],Cell* s,Cell* t){
-    if((AVAILABLE!=s->status)||(AVAILABLE!=t->status))return false;
-    Stack<Cell*> path;
-    s->incoming=UNKNOWN;s->status=ROUTE;path.push(s);
-    do{
-        Cell* c=path.top();
-        if(c==t)return true;
-        while(NO_WAY>(c->outgoing=nextESWN(c->outgoing)))
-          if(AVAILABLE==(neighbor(c)->status))break;
-        if(NO_WAY<=c->outgoing)
-          {c->status=BACKTRACKED;path.pop();}
-        else
-          {path.push(advence(c));c->outgoing=UNKNOWN;c->status=ROUTE;}
-    }while(!path.empty());
-    return false;
 }
