@@ -1,4 +1,5 @@
 #include "Stack.h"
+#include <cstdlib> 
 typedef enum {AVAILABLE,ROUTE,BACKTRACKED,WALL }Status;
 
 typedef enum {UNKNOWN,EAST,SOUTH,WEST,NORTH,NO_WAY}ESWN;
@@ -22,7 +23,6 @@ inline Cell*neighbor(Cell*cell){
         default:exit(-1);
     } 
 }
-
 inline Cell*advence(Cell*cell){ 
     Cell*next;
     switch(cell->outgoing){

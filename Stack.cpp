@@ -51,7 +51,7 @@ bool paren(const char exp[],int lo,int hi){
     return S.empty();
 }
 #define N_OPTR 9
-typename enum {ADD,SUB,MUL,DIV,POW,FAC,L_P,R_P,EOE}Operator;\
+enum Operator {ADD,SUB,MUL,DIV,POW,FAC,L_P,R_P,EOE};
 
 const char pri[N_OPTR][N_OPTR]={
 /*                 |--------------------| */
@@ -110,13 +110,6 @@ float calcu(float a, char op, float b)
     }
 }
 
-void append(char*& RPN, float opnd)
-{
-    char buf[32];
-    sprintf(buf, "%.2f ", opnd);
-    while (*buf) *RPN++ = *buf++;
-}
-
 void append(char*& RPN, char op)
 {
     *RPN++ = op;
@@ -142,7 +135,7 @@ float evaluate ( char*S,char*& RPN){
                     float p0pnd = opnd.pop();
                     opnd.push(calcu(op,p0pnd));
                 }else{
-                    float p0pnd = opnd.pop(),p0pnd1 = opnd.pop();
+                    float p0pnd2= opnd.pop(),p0pnd1 = opnd.pop();
                     opnd.push(calcu(p0pnd1,op,p0pnd2));
                 }
                 break;

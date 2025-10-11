@@ -1,4 +1,7 @@
 #include "Stack.h"
+
+int nCheck = 0;   // 检查次数
+int nSolu = 0;    // 解的数量
 struct Queen{
     int x,y;
     Queen(int xx=0,int yy=0):x(xx),y(yy){};
