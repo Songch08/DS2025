@@ -15,7 +15,7 @@ protected:
     void insertionSort(ListNodePosi(T),int);
 
 public:
-
+    typedef ListNodePosi(T) Posi;
     List() { init(); }
     List(List<T> const& L);
     List(List<T> const& L,Rank r,int n);
