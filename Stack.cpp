@@ -10,14 +10,11 @@ void readNumber(char*& p, Stack<T>& stk)
 {
     stk.push((T)(*p - '0'));           
     while (isdigit(*(++p)))            
-        stk.top() = 10 * stk.top() + (*p - '0');
+        stk.push(stk.opp()*10+(*p - '0'));
     if ('.' != *p) return;           
-
     float fraction = 1;
-    while (isdigit(*(++p))) {          
-        fraction /= 10;
-        stk.top() += (*p - '0') * fraction;
-    }
+    while (isdigit(*(++p))) 
+        stk.push(stk.opp()+(*p - '0')*(fraction/=10));
 }
 void convert(Stack<int>& S, _int64 n,int base) {
     static char digits[] 
@@ -110,11 +107,21 @@ float calcu(float a, char op, float b)
     }
 }
 
-void append(char*& RPN, char op)
-{
-    *RPN++ = op;
-    *RPN++ = ' ';
+void append(char*rpn,float opnd){
+    int n=strlen(rpn);
+    char buf[64];
+    if(opnd==(float)(int)opnd) sprintf(buf,"%.2f \0",opnd);
+    else                       sprintf(buf,"%d \0",opnd);
+    rpn=(char*) realloc(rpn,sizeof(char)*(n+strlen(buf)+1));
+    strcpy(rpn,buf);
 }
+
+void append(char*rpn,char optr){
+    int n=strlen(rpn);
+    rpn=(char*) realloc(rpn,sizeof(char)*(n+3));
+    sprintf(rpn+n,"%c \0",optr); rpn[n+2]='\0';
+}
+
 float evaluate ( char*S,char*& RPN){
     Stack<float> opnd;Stack<char> optr;
     optr.push('\0');
