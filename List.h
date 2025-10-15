@@ -1,3 +1,5 @@
+#include <cstdlib> 
+#include <ctime> 
 #include "listNode.h"
 
 template <typename T> class List { 
@@ -26,8 +28,8 @@ public:
     Rank size() const { return _size; }
     bool empty() const { return _size<=0; }
     T& operator[](Rank r) const;
-    ListNodePosi(T) first() const { return _header->_succ; }
-    ListNodePosi(T) last() const { return _tailer->_pred; }
+    ListNodePosi(T) first() const { return header->succ; }
+    ListNodePosi(T) last() const { return trailer->pred; }
     bool vaild (ListNodePosi(T) p)
     {return p && (trailer != p)&& (header != p);}
     int disordered() const;
@@ -59,8 +61,8 @@ public:
 template <typename T> void List<T>::init(){ 
     header = new ListNode<T>;
     trailer = new ListNode<T>;
-    header->_succ = trailer;header->_pred = NULL;
-    trailer->_pred = header;trailer->_succ = NULL;
+    header->succ = trailer;header->pred = NULL;
+    trailer->pred = header;trailer->succ = NULL;
     _size = 0;
 }
 template <typename T>
@@ -89,13 +91,13 @@ template <typename T> ListNodePosi(T) List<T>::insertB(ListNodePosi(T) p,T const
 template<typename T>
 ListNodePosi(T) ListNode<T>::insertAsPred(T const& e){
     ListNodePosi(T) x = new ListNode(e,pred,this);
-    pred->_succ = x;pred = x;
+    pred->succ = x;pred = x;
     return x;
 }
 template <typename T>
 ListNodePosi(T) ListNode<T>::insertAsSucc(T const& e){
     ListNodePosi(T) x = new ListNode(e,this,succ);
-    succ->_pred = x;succ = x;
+    succ->pred = x;succ = x;
     return x;
 }
 template <typename T>
@@ -113,7 +115,7 @@ template <typename T>
 List<T>::List(List<T> const& L,int r,int n){ copyNodes(L[r],n);}
 template <typename T> T List<T>::remove(ListNodePosi(T) p){ 
     T e = p->data;
-    p->_pred->_succ = p->_succ;p->_succ->_pred = p->_pred;
+    p->pred->succ = p->succ;p->succ->pred = p->pred;
     delete p;_size--;
     return e;
 }
@@ -121,7 +123,7 @@ template <typename T> List<T>::~List()
 { clear();delete header;delete trailer;}
 template <typename T> int List<T>::clear(){ 
     int oldSize = _size;
-    while(0<_size) remove(header->_succ);
+    while(0<_size) remove(header->succ);
     return oldSize;
 }
 template <typename T> int List<T>::deduplicate(){
@@ -135,7 +137,7 @@ template <typename T> int List<T>::deduplicate(){
     return oldSize-_size;
 }
 template <typename T> void List<T>::traverse (void(*visit)(T&))
-{ for (ListNodePosi(T) p=header->_succ;p!=trailer;p=p->_succ) visit(&p->data);}
+{ for (ListNodePosi(T) p=header->succ;p!=trailer;p=p->succ) visit(p->data);}
 
 template <typename T> template <typename VST>
 void List<T>::traverse(VST& visit)
@@ -165,17 +167,17 @@ template <typename T> void List<T>::sort(ListNodePosi(T) p, int n){
 template <typename T>
 void List<T>::insertionSort(ListNodePosi(T) p,int n){ 
     for (int i = 0; i < n; i++){
-        insertA(search(p->data,i,p),p->data)
+        insertA(search(p->data,i,p),p->data);
         p = p->_succ;remove(p->_pred);
     }
 }
 template <typename T>
 void List<T>::selectionSort(ListNodePosi(T) p,int n){ 
-    ListNodePosi(T) head = p->_pred;ListNodePosi tail=p;
+    ListNodePosi(T) head = p->_pred;ListNodePosi(T) tail=p;
     for (int i = 0; i < n; i++) tail = tail->_succ;
     while (1<n){
         ListNodePosi(T) max = selectMax(head->_succ,n);
-        insertB(tail,remove(max))
+        insertB(tail,remove(max));
         tail = tail->_pred;n--;
     }
 }

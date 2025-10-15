@@ -3,6 +3,8 @@
 #include <cctype>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
+#include <cstdio>
 using namespace std;
 
 template <typename T>
@@ -10,13 +12,13 @@ void readNumber(char*& p, Stack<T>& stk)
 {
     stk.push((T)(*p - '0'));           
     while (isdigit(*(++p)))            
-        stk.push(stk.opp()*10+(*p - '0'));
+        stk.push(stk.pop()*10+(*p - '0'));
     if ('.' != *p) return;           
     float fraction = 1;
     while (isdigit(*(++p))) 
-        stk.push(stk.opp()+(*p - '0')*(fraction/=10));
+        stk.push(stk.pop()+(*p - '0')*(fraction/=10));
 }
-void convert(Stack<int>& S, _int64 n,int base) {
+void convert(Stack<int>& S,long long n,int base) {
     static char digits[] 
     = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
     while (n>0){
