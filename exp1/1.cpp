@@ -2,10 +2,12 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <chrono>  // 使用 chrono 来进行更高精度的计时
 #include <string>
 #include "../Vector.h"
-#include <windows.h>
+#include <windows.h>  // 需要包含这个头文件来使用 MessageBox
 using namespace std;
+using namespace std::chrono;
 
 struct Complex {
     double real, imag;
@@ -42,6 +44,7 @@ struct Complex {
         return os;
     }
 };
+
 Complex randComplex(int maxR = 10) {
     return Complex(rand() % maxR, rand() % maxR);
 }
@@ -54,8 +57,8 @@ void printVec(const Vector<T>& V, const char* info = "") {
     cout << endl;
 }
 
-double elapsed(clock_t st, clock_t ed) {
-    return double(ed - st) / CLOCKS_PER_SEC;
+double elapsed(steady_clock::time_point st, steady_clock::time_point ed) {
+    return duration_cast<duration<double>>(ed - st).count();  // 返回秒数
 }
 
 Vector<Complex> rangeSearch(const Vector<Complex>& V, double m1, double m2) {
@@ -70,6 +73,7 @@ Vector<Complex> rangeSearch(const Vector<Complex>& V, double m1, double m2) {
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
+
     srand((unsigned)time(nullptr));
     const int N = 20;          
     Vector<Complex> A;
@@ -95,18 +99,21 @@ int main() {
     A.deduplicate();
     printVec(A, "deduplicate后：\n");
 
-    Vector<Complex> B = A;  
+    Vector<Complex> B = A;
 
-    clock_t t0 = clock();
+    // 使用 std::chrono 进行计时
+    auto t0 = steady_clock::now();  // 使用 steady_clock 开始计时
+    cout << "开始执行 bubbleSort...\n";
     B.bubbleSort(0, B.size());
-    clock_t t1 = clock();
-    cout << "bubbleSort 耗时：" << elapsed(t0, t1) << "s\n";
+    auto t1 = steady_clock::now();  // 使用 steady_clock 结束计时
+    cout << "bubbleSort 耗时：" << elapsed(t0, t1) << "秒\n";
 
-    B = A;               
-    t0 = clock();
+    B = A;
+    t0 = steady_clock::now();  // 再次使用 steady_clock
+    cout << "开始执行 mergeSort...\n";
     B.mergeSort(0, B.size());
-    t1 = clock();
-    cout << "mergeSort  耗时：" << elapsed(t0, t1) << "s\n";
+    t1 = steady_clock::now();
+    cout << "mergeSort 耗时：" << elapsed(t0, t1) << "秒\n";
 
     /*---- 3. 区间查找 ----*/
     double m1 = 3.0, m2 = 7.0;
