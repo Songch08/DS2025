@@ -2,10 +2,10 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-#include <chrono>  // 使用 chrono 来进行更高精度的计时
+#include <chrono>  
 #include <string>
 #include "../Vector.h"
-#include <windows.h>  // 需要包含这个头文件来使用 MessageBox
+#include <windows.h>  
 using namespace std;
 using namespace std::chrono;
 
@@ -58,7 +58,7 @@ void printVec(const Vector<T>& V, const char* info = "") {
 }
 
 double elapsed(steady_clock::time_point st, steady_clock::time_point ed) {
-    return duration_cast<duration<double>>(ed - st).count();  // 返回秒数
+    return duration_cast<duration<double>>(ed - st).count();  
 }
 
 Vector<Complex> rangeSearch(const Vector<Complex>& V, double m1, double m2) {
@@ -101,21 +101,19 @@ int main() {
 
     Vector<Complex> B = A;
 
-    // 使用 std::chrono 进行计时
-    auto t0 = steady_clock::now();  // 使用 steady_clock 开始计时
+    auto t0 = steady_clock::now();  
     cout << "开始执行 bubbleSort...\n";
     B.bubbleSort(0, B.size());
-    auto t1 = steady_clock::now();  // 使用 steady_clock 结束计时
+    auto t1 = steady_clock::now();  
     cout << "bubbleSort 耗时：" << elapsed(t0, t1) << "秒\n";
 
     B = A;
-    t0 = steady_clock::now();  // 再次使用 steady_clock
+    t0 = steady_clock::now(); 
     cout << "开始执行 mergeSort...\n";
     B.mergeSort(0, B.size());
     t1 = steady_clock::now();
     cout << "mergeSort 耗时：" << elapsed(t0, t1) << "秒\n";
 
-    /*---- 3. 区间查找 ----*/
     double m1 = 3.0, m2 = 7.0;
     Vector<Complex> sub = rangeSearch(B, m1, m2);
     printVec(sub, "模在[3,7]的子向量：\n");
