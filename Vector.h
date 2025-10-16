@@ -1,3 +1,5 @@
+#ifndef VECTOR_H
+#define VECTOR_H
 #include <algorithm>
 #include "Fib.h"
 using namespace std;
@@ -236,3 +238,4 @@ void Vector<T>::merge(Rank lo, Rank mi, Rank hi) {
 
     delete[] B;
 }
+#endif
