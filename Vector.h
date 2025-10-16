@@ -12,16 +12,17 @@ protected:
 	void expand();
 	void shrink();
 	bool bubble(Rank lo, Rank hi);
-	void bubbleSort(Rank lo, Rank hi);
+	
 	Rank max(Rank lo, Rank hi);
 	void selectionSort(Rank lo, Rank hi);
 	void merge(Rank lo, Rank mi, Rank hi);
-	void mergeSort(Rank lo, Rank hi);
+	
 	Rank partition(Rank lo, Rank hi);
 	void quickSort(Rank lo, Rank hi);
 	void heapSort(Rank lo, Rank hi);
 public:
-
+    void bubbleSort(Rank lo, Rank hi);
+	void mergeSort(Rank lo, Rank hi);
 	Vector(int c = DEFAULT_CAPACITY, int s = 0, T v = 0) {
 		_elem = new T[_capacity = c];
 		for (_size = 0; _size < s; ++_size) {
@@ -211,13 +212,27 @@ void Vector<T>::mergeSort(Rank lo, Rank hi) {
 }
 template <typename T>
 void Vector<T>::merge(Rank lo, Rank mi, Rank hi) {
-	T* A = _elem + lo;
-	int lb = mi - lo; T* B = new T[lb];
-	for (Rank i = 0; i < lb; B[i] = A[i++]);
-	int lc = hi - mi; T* C = _elem + mi;
-	for (Rank i = 0, j = 0, k = 0; (j < lb) || (k < lc);) {
-		if ((j < lb) && (!(k < lc) || (B[j] <= C[k])))A[i++] = B[j++];
-		if ((k < lc) && (!(j < lc) || (C[k] <= B[j])))A[i++] = B[k++];
-	}
-	delete[]B;
+    T* A = _elem + lo;
+    int lb = mi - lo;
+    T* B = new T[lb];
+    
+    // 拷贝左半部分到 B 中
+    for (Rank i = 0; i < lb; ++i) {
+        B[i] = A[i];
+    }
+
+    int lc = hi - mi;
+    T* C = _elem + mi;
+
+    // 合并操作
+    Rank i = 0, j = 0, k = 0;
+    while (j < lb || k < lc) {
+        if (j < lb && (k >= lc || B[j] <= C[k])) {
+            A[i++] = B[j++];
+        } else {
+            A[i++] = C[k++];
+        }
+    }
+
+    delete[] B;
 }
