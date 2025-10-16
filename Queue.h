@@ -1,9 +1,8 @@
 #include "List.h"
-#include <cstdlib>   // rand()
-#include <ctime>     // time()
-#include <iostream>  // cout, endl
+#include <cstdlib>   
+#include <ctime>     
+#include <iostream>  
 
-// 只定义一次 Customer 结构体
 struct Customer {
     int window;
     unsigned int time;
@@ -19,16 +18,16 @@ public:
     int size() const { return _list.size(); }
 
 private:
-    List<T> _list;  // 使用 List 实现队列
+    List<T> _list;  
 
-    // 辅助封装
+
     void insertAsLast(T const& e) { _list.insertAsLast(e); }
     T remove(typename List<T>::Posi p) { return _list.remove(p); }
     typename List<T>::Posi first() { return _list.first(); }
 };
 
 int bestWindow(Queue<Customer> windows[], int nWin);
-bool ServiceClosed();  // 模拟服务是否结束
+bool ServiceClosed(); 
 void Serve(Customer& e);
 
 void RoundRobin() {
