@@ -1,8 +1,3 @@
-/************************************************
-*  2.cpp  字符串四则计算器（单文件版）
-*  依赖：Stack.h   （你已实现）
-*  支持：浮点数、+ - * / ^、括号、一元负号、除零/括号不匹配检测
-*************************************************/
 #include <iostream>
 #include <string>
 #include <cmath>
@@ -11,8 +6,6 @@
 #include "../Stack.h"
 
 using namespace std;
-
-/* ---------- 计算器部分（原 Calculator.h + Calculator.cpp） ---------- */
 static bool isOp(char c) {
     return c=='+'||c=='-'||c=='*'||c=='/'||c=='^';
 }
@@ -45,7 +38,6 @@ double calculate(const string& expr, string& err) {
         for (size_t i = 0; i < expr.size(); ) {
             char c = expr[i];
             if (isspace(c)) { ++i; continue; }
-            /* 数字（含小数） */
             if (isdigit(c) || c == '.') {
                 string buf;
                 while (i < expr.size() &&
@@ -56,14 +48,12 @@ double calculate(const string& expr, string& err) {
                 mayUnary = false;
                 continue;
             }
-            /* 左括号 */
             if (c == '(') {
                 ops.push(c);
                 mayUnary = true;
                 ++i;
                 continue;
             }
-            /* 右括号 */
             if (c == ')') {
                 while (!ops.empty() && ops.top() != '(') {
                     char op = ops.pop();
@@ -71,14 +61,14 @@ double calculate(const string& expr, string& err) {
                     nums.push(apply(a, op, b));
                 }
                 if (ops.empty()) { err = "Mismatched )"; return NAN; }
-                ops.pop();                 // pop '('
+                ops.pop();                 
                 mayUnary = false;
                 ++i;
                 continue;
             }
-            /* 运算符 */
+           
             if (isOp(c)) {
-                if (c == '-' && mayUnary) {   // 一元负号
+                if (c == '-' && mayUnary) {   
                     nums.push(0.0);
                 }
                 while (!ops.empty() && ops.top() != '(' &&
@@ -93,11 +83,11 @@ double calculate(const string& expr, string& err) {
                 ++i;
                 continue;
             }
-            /* 其他字符 */
+           
             err = "Invalid char";
             return NAN;
         }
-        /* 清空剩余运算符 */
+       
         while (!ops.empty()) {
             char op = ops.pop();
             if (op == '(' || op == ')') { err = "Mismatched ("; return NAN; }
@@ -112,7 +102,6 @@ double calculate(const string& expr, string& err) {
     }
 }
 
-/* ---------- 主函数 + 测试 ---------- */
 void test(const string& s) {
     string err;
     double v = calculate(s, err);
