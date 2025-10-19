@@ -2,12 +2,10 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-#include <chrono>  
 #include <string>
 #include "../Vector.h"
 #include <windows.h>  
 using namespace std;
-using namespace std::chrono;
 
 struct Complex {
     double real, imag;
@@ -57,8 +55,9 @@ void printVec(const Vector<T>& V, const char* info = "") {
     cout << endl;
 }
 
-double elapsed(steady_clock::time_point st, steady_clock::time_point ed) {
-    return duration_cast<duration<double>>(ed - st).count();  
+// 使用 clock() 计时
+double elapsed(clock_t start, clock_t end) {
+    return double(end - start) / CLOCKS_PER_SEC;
 }
 
 Vector<Complex> rangeSearch(const Vector<Complex>& V, double m1, double m2) {
@@ -101,18 +100,20 @@ int main() {
 
     Vector<Complex> B = A;
 
-    auto t0 = steady_clock::now();  
+    clock_t start, end;
+
     cout << "开始执行 bubbleSort...\n";
+    start = clock();
     B.bubbleSort(0, B.size());
-    auto t1 = steady_clock::now();  
-    cout << "bubbleSort 耗时：" << elapsed(t0, t1) << "秒\n";
+    end = clock();
+    cout << "bubbleSort 耗时：" << elapsed(start, end) << " 秒\n";
 
     B = A;
-    t0 = steady_clock::now(); 
     cout << "开始执行 mergeSort...\n";
+    start = clock();
     B.mergeSort(0, B.size());
-    t1 = steady_clock::now();
-    cout << "mergeSort 耗时：" << elapsed(t0, t1) << "秒\n";
+    end = clock();
+    cout << "mergeSort 耗时：" << elapsed(start, end) << " 秒\n";
 
     double m1 = 3.0, m2 = 7.0;
     Vector<Complex> sub = rangeSearch(B, m1, m2);

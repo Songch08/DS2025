@@ -38,7 +38,6 @@ void printHead(const Vector<int>& v, int k = 20) {
 }
 
 void randomTests() {
-    cout << "==== 随机 10 组大数据测试 ====\n";
     for (int t = 1; t <= 10; ++t) {
         int n = lenD(rng);
         Vector<int> h;
