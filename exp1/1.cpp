@@ -54,8 +54,6 @@ void printVec(const Vector<T>& V, const char* info = "") {
         cout << V[i] << ' ';
     cout << endl;
 }
-
-// 使用 clock() 计时
 double elapsed(clock_t start, clock_t end) {
     return double(end - start) / CLOCKS_PER_SEC;
 }

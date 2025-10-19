@@ -114,16 +114,11 @@ void test(const string& s) {
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);
-    cout << "==== 基本四则 + 括号 + 幂 ====\n";
     test("3 + 4 * 2 / (1 - 5) ^ 2 ^ 3");
     test("-4 + (2 - 3) * 5");
     test("3 ^ 2 ^ 2");
     test("(1 + 2) * 3 - 4 / 5");
     cout << "\n==== 异常 case ====\n";
-    test("3 + + 4");
-    test("3 + 4 )");
-    test("3 / 0");
-    cout << "\n==== 交互输入（Ctrl+D 结束） ====\n";
     string line;
     while (cout << "> " && getline(cin, line)) {
         string err;
