@@ -13,8 +13,8 @@ public:
    BinNodePosi(T) insertAsRoot(T const& e);
    BinNodePosi(T) insertAsLC(BinNodePosi(T) x, T const& e);
    BinNodePosi(T) insertAsRC(BinNodePosi(T) x, T const& e);
-   BinNodePosi(T) attachAsLC(BinNodePosi(T) x, BinTree<T>* &T);
-   BinNodePosi(T) attachAsRC(BinNodePosi(T) x, BinTree<T>* &T);
+   BinNodePosi(T) attachAsLC(BinNodePosi(T) x, BinTree<T>* &S);
+   BinNodePosi(T) attachAsRC(BinNodePosi(T) x, BinTree<T>* &S);
    int remove(BinNodePosi(T) x);
    BinTree<T>* secede(BinNodePosi(T) x);
    template <typename VST>
