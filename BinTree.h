@@ -1,4 +1,5 @@
 #include "BinNode.h"
+#include "Queue.h"
 template <typename T> class BinTree { 
 protected:
    int _size;BinNodePosi(T) _root;
@@ -70,4 +71,46 @@ static int removeAt(BinNodePosi(T) x){
    if (!x) return 0;
    int n = 1 + removeAt(x->lc) + removeAt(x->rc);
    release(x->data);release(x);return n;
+}
+
+template <typename T> 
+BinTree<T>* BinTree<T>::secede(BinNodePosi(T) x){
+   FromParentTo(*x) = NULL;
+   updateHeightAbove(x->parent);
+   BinTree<T>* S = new BinTree<T>();S->_root = x;x->parent = NULL;
+   S->_size = x->size();_size -= S->_size;return S;
+}
+
+template <typename T,typename VST>
+void travPre_R (BinNodePosi(T) x, VST& visit){ 
+   if (!x) return;
+   visit(x->data);
+   travPre_R(x->lc, visit);
+   travPre_R(x->rc, visit);
+}
+
+template <typename T,typename VST>
+void travPost_R (BinNodePosi(T) x, VST& visit){ 
+   if (!x) return;
+   travPost_R(x->lc, visit);
+   travPost_R(x->rc, visit);
+   visit(x->data);
+}
+
+template <typename T,typename VST>
+void travIn_R (BinNodePosi(T) x, VST& visit){ 
+   if (!x) return;
+   travIn_R(x->lc, visit);
+   visit(x->data);
+   travIn_R(x->rc, visit);
+}
+template <typename T> template <typename VST>
+void BinNode<T>::travLevel(VST& visit){ 
+   Queue<BinNodePosi(T)> Q;
+   Q.enqueue( this);
+   while (!Q.empty()){ 
+      BinNodePosi(T) x = Q.dequeue();visit(x->data);
+      if (HasLChild(*x)) Q.enqueue(x->lc);
+      if (HasRChild(*x)) Q.enqueue(x->rc);
+   }
 }
