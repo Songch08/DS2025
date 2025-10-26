@@ -1,5 +1,26 @@
+#include <algorithm> 
 #include "BinNode.h"
 #include "Queue.h"
+#include <type_traits>  // 用于 std::is_pointer
+
+// 释放数据
+template <typename T>
+void release(T& data) {
+    if constexpr (std::is_pointer<T>::value) {
+        delete data;  // 如果数据是指针类型，释放指针
+    }
+    // 如果 T 不是指针类型，则不做任何操作，因为它是自动管理的
+}
+
+// 释放节点
+template <typename T>
+void release(BinNode<T>* node) {
+    if (node) {
+        release(node->data);  // 释放节点数据
+        delete node;           // 释放节点本身的内存
+    }
+}
+
 template <typename T> class BinTree { 
 protected:
    int _size;BinNodePosi(T) _root;
@@ -32,7 +53,7 @@ public:
    {return _root && t._root && (_root == t._root);}
 };
 template <typename T> int BinTree<T>::updateHeight(BinNodePosi(T) x)
-{ return x->height = 1 + max(stature(x->lc), stature(x->rc));}
+{ return x->height = 1 + std::max(stature(x->lc), stature(x->rc));}
 
 template <typename T> void BinTree<T>::updateHeightAbove(BinNodePosi(T) x)
 { while (x) {updateHeight(x); x = x->parent; } }
@@ -66,6 +87,7 @@ int BinTree<T>::remove(BinNodePosi(T) x){
    updateHeightAbove(x->parent);
    int n = removeAt(x);_size -= n;return n;
 }
+
 template <typename T>
 static int removeAt(BinNodePosi(T) x){ 
    if (!x) return 0;
