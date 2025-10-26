@@ -1,23 +1,20 @@
 #include <algorithm> 
 #include "BinNode.h"
 #include "Queue.h"
-#include <type_traits>  // 用于 std::is_pointer
+#include <type_traits>  
 
-// 释放数据
 template <typename T>
 void release(T& data) {
     if constexpr (std::is_pointer<T>::value) {
-        delete data;  // 如果数据是指针类型，释放指针
+        delete data;  
     }
-    // 如果 T 不是指针类型，则不做任何操作，因为它是自动管理的
 }
 
-// 释放节点
 template <typename T>
 void release(BinNode<T>* node) {
     if (node) {
-        release(node->data);  // 释放节点数据
-        delete node;           // 释放节点本身的内存
+        release(node->data);  
+        delete node;          
     }
 }
 
