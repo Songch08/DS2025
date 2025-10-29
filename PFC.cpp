@@ -50,10 +50,31 @@ PFCTable* generateTable (PFCTree* tree){
     release(code);return table;
 }
 
+int encode(PFCTable* table,Bitmap& codeString,char* str){ 
+    int n = 0;
+    for(size_t m=strlen(s),i=0;i<m;i++){
+        char** pCharCode =table->get(s[i]);
+        if(!pCharCode) pCharCode = table->get(s[i]+'A'-'a');
+        if(!pCharCode) pCharCode = table->get(' ');
+        printf("%s",*pCharCode);
+        for(size_t m=strlen(*pCharCode),j=0;j<m;j++)
+           '1'==*(*pCharCode+j)?codeString.set(n++):codeString.clear(n++);
+    }
+    return n;
+}
+
+void decode(PFCTree* tree,Bitmap& codeString,int n){ 
+    BinNodePosi(char) x = tree->root();
+    for(int i=0;i<n;i++){
+        x=code.test(i)?x->rc:x->lc;
+        if(IsLeaf(*x)){printf("%c",x->data);x=tree->root();}
+    }
+}
+
 int main(int argc, char* argv[]){
     PFCForest* forest =initForest();
     PFCTree* tree = generateTree(forest);release(forest);
-    PFCable* table = generateTable(tree);
+    PFCTable* table = generateTable(tree);
     for (int i=1;i<argc;i++){
         Bitmap codeString;
         int n = encode(table,codeString,argv[i]);
