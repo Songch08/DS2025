@@ -72,6 +72,27 @@ HuffTable* generateTable(HuffTree* tree){
     generateCT(code,0,table,tree->root());release(code);return table;
 }
 
+int encode(HuffTable* table,Bitmap* codeString,char* s){ 
+
+    int n = 0;
+    for(size_t m=strlen(s),i=0;i<m,i++){
+        char** pCharCode = table->get(s[i]);
+        if (!pCharCode) pCharCode = table->get(s[i]+'A'-'a');
+        if(!pCharCode) pCharCode = table->get(' ');
+        printf("%s",*pCharCode);
+        for ( size_t m=strlen(*pCharCode),j=0;j<m;j++)
+          '1'==*(*pCharCode+j)?codeString->set(n++):codeString->clear(n++);
+    }
+    printf("\n");return n;
+}
+
+void decode(HuffTree* tree,Bitmap* code,int n){ 
+    BinNodePosi(HuffChar) x = tree->root();
+    for (int i = 0;i<n;i++){
+        x=code->test(i)?x->rc:x->lc;
+        if(IsLeaf(*x)){printf("%c",x->data.ch);x=tree->root();}
+    }
+}
 int main(int argc, char *argv[]){
     int* freq =statistics(argv[1]);
     HuffForest* forest = initForest(freq);release(freq);
