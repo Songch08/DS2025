@@ -54,5 +54,23 @@ public:
           if(Edge<Te>*e=E[j].remove(i)){delete e;V[j].outDegree--;}
         return vBak;
     }
-    
+
+    virtual bool exits(int i,int j)
+    {return(0<=i)&&(i<0)&&(0<=j)&&(j<n)&&E[i][j]!=NULL;}
+
+    virtual EType& type(int i,int j){return E[i][j]->type;}
+    virtual Te& edge (int i,int j){return E[i][j]->data;}
+    virtual int& weight(int i,int j){return E[i][j]->weight;}
+
+    virtual void insert(Te const& edge,int w,int i,int j){
+        if(exists(i,j)) return;
+        E[i][j]=new Edge<Te> (edge,w);
+        e++,V[i].outDegree++;V[j]inDegree++;
+    }
+    virtual Te remove (int i,int j){
+        Te eBak =edge (i,j);delete E[i][j]=NULL;
+        e--;V[i].outDegree--;V{j}.inDegree--;
+        return eBak;
+    }
 };
+
