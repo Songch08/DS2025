@@ -1,3 +1,7 @@
+#ifndef BINNODE_H
+#define BINNODE_H
+
+
 #include <cstdlib> 
 #define BinNodePosi(T) BinNode<T>*
 #define stature(p) ((p)?(p)->height: -1)
@@ -55,7 +59,7 @@ template <typename T> BinNodePosi(T) BinNode<T>::insertAsRC(T const& e)
 
 template <typename T> template <typename VST>
 void BinNode<T>::travIn(VST& visit) { 
-    travIn_R(this, visit);  // 直接调用递归中序遍历
+    travIn_R(this, visit);  
 }
-
+#endif 
 

@@ -1,6 +1,9 @@
+#ifndef LIST_H
+#define LIST_H
 #include <cstdlib> 
 #include <ctime> 
 #include "listNode.h"
+
 
 template <typename T> class List { 
 
@@ -207,3 +210,5 @@ void List<T>::mergeSort(ListNodePosi(T) & p,int n){
     mergeSort(p,m);mergeSort(q,n-m);
     merge(p,n,*this,q,n-m);
 }
+
+#endif 

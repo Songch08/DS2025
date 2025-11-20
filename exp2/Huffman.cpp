@@ -7,11 +7,8 @@
 
 #include "../List.h"
 #include "../Bitmap.h"
-#include "../HashTable.h"   // 注意名称是 HashTable
+#include "../HashTable.h"  
 
-// --------------------------------------------------------
-// Huffman 节点数据（只定义一次）
-// --------------------------------------------------------
 struct HuffChar {
     char ch;
     int weight;
@@ -20,23 +17,15 @@ struct HuffChar {
     bool operator==(const HuffChar& hc) const { return weight == hc.weight; }
 };
 
-// --------------------------------------------------------
-// HuffTree 是以 HuffChar 为节点数据的 BinTree
-// --------------------------------------------------------
+
 #define HuffTree BinTree<HuffChar>
 
-// --------------------------------------------------------
-// 依赖 HuffTree，因此必须写在 HuffTree 之后
-// --------------------------------------------------------
 typedef List<HuffTree*> HuffForest;
 typedef Bitmap HuffCode;
 typedef HashTable<char, char*> HuffTable;
 
 #define N_CHAR  (0x80 - 0x20)
 
-//-------------------------------------------------------------
-// 统计字符频率
-//-------------------------------------------------------------
 int* statistics(char* sample_text_file) {
     int* freq = new int[N_CHAR];
     memset(freq, 0, sizeof(int) * N_CHAR);
@@ -55,9 +44,6 @@ int* statistics(char* sample_text_file) {
 }
 
 
-//-------------------------------------------------------------
-// 初始化森林：每个字符一棵树
-//-------------------------------------------------------------
 HuffForest* initForest(int* freq) {
     HuffForest* forest = new HuffForest;
     for (int i = 0; i < N_CHAR; i++) {
@@ -69,9 +55,6 @@ HuffForest* initForest(int* freq) {
 }
 
 
-//-------------------------------------------------------------
-// 找到权值最小的一棵树并从森林中移除
-//-------------------------------------------------------------
 HuffTree* minHChar(HuffForest* forest) {
     auto p = forest->first();
     auto minNode = p;
@@ -87,12 +70,8 @@ HuffTree* minHChar(HuffForest* forest) {
     return forest->remove(minNode);
 }
 
-
-//-------------------------------------------------------------
-// 构建 Huffman 树
-//-------------------------------------------------------------
 HuffTree* generateTree(HuffForest* forest) {
-    while (forest->size() > 1) {               // <- 注意 size()
+    while (forest->size() > 1) {            
         HuffTree* T1 = minHChar(forest);
         HuffTree* T2 = minHChar(forest);
 
@@ -109,9 +88,6 @@ HuffTree* generateTree(HuffForest* forest) {
 }
 
 
-//-------------------------------------------------------------
-// 递归生成编码表
-//-------------------------------------------------------------
 static void generateCT(Bitmap* code, int length,
                        HuffTable* table, BinNodePosi(HuffChar) v)
 {
@@ -132,9 +108,6 @@ static void generateCT(Bitmap* code, int length,
 }
 
 
-//-------------------------------------------------------------
-// 生成 Huffman 编码表
-//-------------------------------------------------------------
 HuffTable* generateTable(HuffTree* tree) {
     HuffTable* table = new HuffTable;
     Bitmap* code = new Bitmap;
@@ -146,9 +119,6 @@ HuffTable* generateTable(HuffTree* tree) {
 }
 
 
-//-------------------------------------------------------------
-// 编码字符串 s
-//-------------------------------------------------------------
 int encode(HuffTable* table, Bitmap* codeString, char* s) {
     int n = 0;
 
@@ -157,13 +127,11 @@ int encode(HuffTable* table, Bitmap* codeString, char* s) {
         char** pCode = table->get(ch);
 
         if (!pCode && isalpha((unsigned char)ch)) {
-            // 大小写转换
             char ch2 = islower((unsigned char)ch) ? toupper((unsigned char)ch) : tolower((unsigned char)ch);
             pCode = table->get(ch2);
         }
 
-        if (!pCode) pCode = table->get(' ');   // fallback
-
+        if (!pCode) pCode = table->get(' ');  
         if (pCode) {
             printf("%s", *pCode);
 
@@ -180,9 +148,6 @@ int encode(HuffTable* table, Bitmap* codeString, char* s) {
 }
 
 
-//-------------------------------------------------------------
-// 解码
-//-------------------------------------------------------------
 void decode(HuffTree* tree, Bitmap* code, int n) {
     BinNodePosi(HuffChar) x = tree->root();
 
@@ -198,9 +163,6 @@ void decode(HuffTree* tree, Bitmap* code, int n) {
 }
 
 
-//-------------------------------------------------------------
-// main
-//-------------------------------------------------------------
 int main(int argc, char* argv[]) {
 
     if (argc < 3) {
@@ -208,21 +170,16 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    // 1. 统计频率
     int* freq = statistics(argv[1]);
 
-    // 2. 构造森林
     HuffForest* forest = initForest(freq);
     delete[] freq;
 
-    // 3. 构建 Huffman 树
     HuffTree* tree = generateTree(forest);
     delete forest;
 
-    // 4. 编码表
     HuffTable* table = generateTable(tree);
 
-    // 5. 编码+解码每个输入单词
     for (int i = 2; i < argc; i++) {
         Bitmap* codeString = new Bitmap;
 

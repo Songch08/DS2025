@@ -1,7 +1,3 @@
-/**********************************************************************
- * HashTable (Dictionary 实现之一)
- * 邓俊辉《数据结构（C++版）》源码
- **********************************************************************/
 
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
@@ -9,14 +5,14 @@
 #include "Entry.h"
 #include "Bitmap.h"
 #include "Vector.h"
-
+#include "Hash.h"
 template <typename K, typename V>
 class HashTable {
 protected:
-    int M;               // hash table size
-    int N;               // number of actual records
-    Entry<K, V>** ht;    // table
-    Bitmap* lazyRemoval; // lazy deletion mask
+    int M;               
+    int N;               
+    Entry<K, V>** ht;    
+    Bitmap* lazyRemoval; 
 
 protected:
     int probe4Hit(const K& k) const {
@@ -107,4 +103,4 @@ public:
     }
 };
 
-#endif // HASHTABLE_H
+#endif 
