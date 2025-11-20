@@ -30,7 +30,7 @@ public:
     T& operator[](Rank r) const;
     ListNodePosi(T) first() const { return header->succ; }
     ListNodePosi(T) last() const { return trailer->pred; }
-    bool vaild (ListNodePosi(T) p)
+    bool valid (ListNodePosi(T) p)
     {return p && (trailer != p)&& (header != p);}
     int disordered() const;
     ListNodePosi(T) find(T const& e) const
