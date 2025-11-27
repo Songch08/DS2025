@@ -19,6 +19,7 @@ private:
   void DFS(int,int&);
   void BCC(int,int&,Stack<int>&);  
   bool TSort(int,int&,Stack<Tv>*);
+protected:
   template <typename PU> void PFS(int, PU);
 public: 
 
@@ -184,7 +185,7 @@ void Graph<Tv,Te>::pfs(int s,PU prioUpdater){
 
 template <typename Tv,typename Te> template <typename PU>
 void Graph<Tv,Te>::PFS(int s,PU prioUpdater){
-  prioUpdater(s,0);status(s)=VISITED;parent(s)=-1;
+  priority(s)=0;status(s)=VISITED;parent(s)=-1;
   while(1){
     for(int w=firstNbr(s);-1<w;w=nextNbr(s,w))
       prioUpdater(this,s,w);
@@ -211,7 +212,7 @@ template <typename Tv,typename Te> struct DijkstraPU{
   virtual void operator()(Graph<Tv,Te>* g,int uk,int v){ 
     if(UNDISCOVERED==g->status(v))
       if(g->priority(v)>g->priority(uk)+g->weight(uk,v)){
-        g->priority(v)=g->priority(uk)->weight(uk,v);
+        g->priority(v)=g->priority(uk)+g->weight(uk,v);
         g->parent(v)=uk;
       }
   }

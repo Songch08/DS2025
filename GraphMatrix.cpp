@@ -55,7 +55,7 @@ public:
         return vBak;
     }
 
-    virtual bool exits(int i,int j)
+    virtual bool exists(int i,int j)
     {return(0<=i)&&(i<0)&&(0<=j)&&(j<n)&&E[i][j]!=NULL;}
 
     virtual EType& type(int i,int j){return E[i][j]->type;}
