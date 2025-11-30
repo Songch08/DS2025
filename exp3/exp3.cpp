@@ -1,206 +1,249 @@
 #include <iostream>
+#include <queue>
 #include <climits>
+#include <stack>
+#include <algorithm>
+#include <functional>
+#include <windows.h> 
 #include "../Vector.h"
-#include "../Graph.h"
-#include "../Stack.h"
-#include "../Queue.h"
-#include <string>
 using namespace std;
 
-template<typename Tv> struct Vertex { 
-    Tv data;int inDegree, outDegree;VStatus status;
-    int dTime, fTime;
-    int parent;int priority;
- Vertex(Tv const& d = Tv()) :
-    data(d), inDegree(0), outDegree(0), status(UNDISCOVERED), 
-    dTime(-1), fTime(-1), parent(-1), priority(INT_MAX) {}
-};
-
-template<typename Te> struct Edge { 
-    Te data;int weight;EType type;
-    Edge(Te const& d, int w ) :data (d), weight (w), type (UNDETERMINED){}
-};
-
-template<typename Tv, typename Te> 
-class GraphMatrix : public Graph<Tv, Te> { 
-private:
-    Vector< Vertex<Tv> > V;
-    Vector< Vector< Edge<Te>* > > E;
-    int n, e;
+// 图的表示：邻接矩阵
+class Graph {
 public:
-    GraphMatrix() {
-        n =e = 0;
+    int V;  // 顶点数
+    vector<vector<int>> adjMatrix;  // 邻接矩阵
+
+    // 构造函数
+    Graph(int V) {
+        this->V = V;
+        adjMatrix.resize(V, vector<int>(V, 0));  // 初始化邻接矩阵为0
     }
 
-
-    ~GraphMatrix(){
-        for(int j=0;j<n;j++)
-            for(int k=0;k<n;k++)
-                delete E[j][k];
+    // 添加边
+    void addEdge(int u, int v, int weight = 1) {
+        adjMatrix[u][v] = weight;
+        adjMatrix[v][u] = weight;  // 如果是无向图，设置对称位置
     }
 
-    virtual Tv& vertex(int i){return V[i].data;}
-    virtual int inDegree(int i){return V[i].inDegree;}
-    virtual int outDegree(int i){return V[i].outDegree;}
-    virtual int firstNbr(int i){return nextNbr(i,n);}
-    virtual int nextNbr(int i, int j) {
-    while (--j >= 0 && !exists(i, j));
-    return j;
-    }
-    virtual VStatus& status(int i) { return V[i].status; }
-
-    virtual int& dTime(int i){return V[i].dTime;}
-    virtual int& fTime(int i){return V[i].fTime;}
-    virtual int& parent(int i){return V[i].parent;}
-    virtual int& priority(int i){return V[i].priority;}
-
-    virtual int insert(Tv const& vertex){
-
-        for (int j = 0; j < n; j++) {
-            E[j].insert(nullptr);  // 修正为nullptr，表示没有边
+    // 输出邻接矩阵
+    void printAdjMatrix() {
+        for (int i = 0; i < V; ++i) {
+            for (int j = 0; j < V; ++j) {
+                cout << adjMatrix[i][j] << " ";
+            }
+            cout << endl;
         }
-        n++; 
-        
-        E.insert(Vector< Edge<Te>* >(n,n,nullptr));
-        return V.insert(Vertex<Tv>(vertex));
-
-        V.insert(Vertex<std::string>(vertex)); // 插入一个字符串类型的顶点
-        return n++; 
     }
-    virtual Tv remove(int i){
-        for(int j=0;j<n;j++)
-          if(exists(i,j)){delete E[i][j];V[j].inDegree--;}
-        E.remove(i);n--;
-        Tv vBak = vertex(i);V.remove(i);
-        for(int j=0;j<n;j++)
-          if(Edge<Te>*e=E[j].remove(i)){delete e;V[j].outDegree--;}
-        return vBak;
-    }
-
-    virtual bool exists(int i,int j)
-    {return(0<=i)&&(i<n)&&(0<=j)&&(j<n)&&E[i][j]!=NULL;}
-
-    virtual EType& type(int i,int j){return E[i][j]->type;}
-    virtual Te& edge (int i,int j){return E[i][j]->data;}
-    virtual int& weight(int i,int j){return E[i][j]->weight;}
-
-    virtual void insert(Te const& edge,int w,int i,int j){
-        if(exists(i,j)) return;
-        E[i][j]=new Edge<Te> (edge,w);
-        e++,V[i].outDegree++;V[j].inDegree++;
-    }
-    virtual Te remove (int i,int j){
-        Te eBak =edge (i,j);delete E[i][j];E[i][j]=NULL;
-        e--;V[i].outDegree--;V[j].inDegree--;  // 修正语法错误
-        return eBak;
-    }
-    void printAdjMatrix();
-    void printShortestPaths(int s); // 新增
-    void printMST();                // 新增
-    void printBCC();
-    void printTraversal();
 };
 
-template<typename Tv, typename Te>
-void GraphMatrix<Tv, Te>::printAdjMatrix() {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (exists(i, j)) {
-                cout << weight(i, j) << "\t";
-            } else {
-                cout << "0\t";
+// BFS 算法
+void BFS(Graph& g, int start) {
+    vector<bool> visited(g.V, false);
+    queue<int> q;
+
+    visited[start] = true;
+    q.push(start);
+
+    while (!q.empty()) {
+        int v = q.front();
+        q.pop();
+        cout << v << " ";
+
+        for (int i = 0; i < g.V; ++i) {
+            if (g.adjMatrix[v][i] != 0 && !visited[i]) {
+                visited[i] = true;
+                q.push(i);
             }
         }
-        cout << endl;
+    }
+    cout << endl;
+}
+
+// DFS 算法
+void DFS(Graph& g, int start, vector<bool>& visited) {
+    visited[start] = true;
+    cout << start << " ";
+
+    for (int i = 0; i < g.V; ++i) {
+        if (g.adjMatrix[start][i] != 0 && !visited[i]) {
+            DFS(g, i, visited);
+        }
     }
 }
 
-template<typename Tv, typename Te>
-void GraphMatrix<Tv, Te>::printShortestPaths(int s) {
-    cout << "Shortest paths from " << vertex(s) << ":" << endl;
-    for (int i = 0; i < n; ++i) {
-        if (i != s)
-            cout << "To " << vertex(i) << ": " << priority(i) << endl;
+// Dijkstra 算法：求单源最短路径
+void Dijkstra(Graph& g, int start) {
+    vector<int> dist(g.V, INT_MAX);
+    dist[start] = 0;
+    vector<bool> visited(g.V, false);
+
+    for (int i = 0; i < g.V; ++i) {
+        int u = -1;
+        for (int j = 0; j < g.V; ++j) {
+            if (!visited[j] && (u == -1 || dist[j] < dist[u])) {
+                u = j;
+            }
+        }
+
+        visited[u] = true;
+        for (int v = 0; v < g.V; ++v) {
+            if (g.adjMatrix[u][v] != 0 && dist[u] + g.adjMatrix[u][v] < dist[v]) {
+                dist[v] = dist[u] + g.adjMatrix[u][v];
+            }
+        }
     }
-}
-template<typename Tv, typename Te>
-void GraphMatrix<Tv, Te>::printMST() {
-    cout << "Minimum Spanning Tree edges:" << endl;
-    for (int i = 0; i < n; ++i) {
-        if (parent(i) != -1)          // 0 以上才是树边
-            cout << vertex(parent(i)) << " - " << vertex(i)
-                 << " (" << weight(parent(i), i) << ")" << endl;
+
+    cout << "最短路径: ";
+    for (int i = 0; i < g.V; ++i) {
+        cout << "从 " << start << " 到 " << i << " 的最短路径为: " << dist[i] << endl;
     }
 }
 
-template<typename Tv, typename Te>
-void GraphMatrix<Tv, Te>::printBCC() {
-    cout << "Biconnected Components and Articulation Points:" << endl;
-    // TODO: 遍历你 bcc() 里记录的 component / cut 数组并打印
+// Kruskal 算法：求最小生成树
+class UnionFind {
+public:
+    vector<int> parent, rank;
+
+    UnionFind(int n) {
+        parent.resize(n);
+        rank.resize(n, 0);
+        for (int i = 0; i < n; ++i) parent[i] = i;
+    }
+
+    int find(int x) {
+        if (x != parent[x]) parent[x] = find(parent[x]);
+        return parent[x];
+    }
+
+    void unite(int x, int y) {
+        int rootX = find(x);
+        int rootY = find(y);
+        if (rootX != rootY) {
+            if (rank[rootX] > rank[rootY]) {
+                parent[rootY] = rootX;
+            } else if (rank[rootX] < rank[rootY]) {
+                parent[rootX] = rootY;
+            } else {
+                parent[rootY] = rootX;
+                rank[rootX]++;
+            }
+        }
+    }
+};
+
+// Kruskal算法实现
+void Kruskal(Graph& g) {
+    vector<pair<int, pair<int, int>>> edges;
+    for (int i = 0; i < g.V; ++i) {
+        for (int j = i + 1; j < g.V; ++j) {
+            if (g.adjMatrix[i][j] != 0) {
+                edges.push_back({g.adjMatrix[i][j], {i, j}});
+            }
+        }
+    }
+
+    sort(edges.begin(), edges.end());
+
+    UnionFind uf(g.V);
+    cout << "最小生成树的边: ";
+    for (auto& edge : edges) {
+        int u = edge.second.first;
+        int v = edge.second.second;
+
+        if (uf.find(u) != uf.find(v)) {
+            uf.unite(u, v);
+            cout << "(" << u << ", " << v << ") ";
+        }
+    }
+    cout << endl;
 }
-template<typename Tv, typename Te>
-void GraphMatrix<Tv, Te>::printTraversal() {
-    for (int i = 0; i < n; i++) {
-        cout << vertex(i) << "(" << dTime(i) << "/" << fTime(i) << ") ";
-        if (parent(i) != -1)
-            cout << "parent: " << vertex(parent(i)) << " ";
-        cout << endl;
+
+// 双连通分量计算
+void findBiconnectedComponents(Graph& g) {
+    vector<bool> visited(g.V, false);
+    vector<int> disc(g.V, -1), low(g.V, -1), parent(g.V, -1);
+    stack<pair<int, int>> st;
+    int time = 0;
+
+    // 递归查找双连通分量
+    std::function<void(int)> dfs = [&](int u) {
+        visited[u] = true;
+        disc[u] = low[u] = time++;
+        for (int v = 0; v < g.V; ++v) {
+            if (g.adjMatrix[u][v] == 0) continue;
+            if (!visited[v]) {
+                parent[v] = u;
+                st.push({u, v});
+                dfs(v);
+                low[u] = min(low[u], low[v]);
+                if (low[v] >= disc[u]) {
+                    cout << "关节点: " << u << endl;
+                    while (st.top() != make_pair(u, v)) {
+                        cout << "(" << st.top().first << ", " << st.top().second << ") ";
+                        st.pop();
+                    }
+                    cout << "(" << st.top().first << ", " << st.top().second << ") ";
+                    st.pop();
+                }
+            } else if (v != parent[u] && disc[v] < disc[u]) {
+                low[u] = min(low[u], disc[v]);
+                st.push({u, v});
+            }
+        }
+    };
+
+    for (int i = 0; i < g.V; ++i) {
+        if (!visited[i]) {
+            dfs(i);
+        }
     }
 }
+
 int main() {
-    // 创建图1
-    GraphMatrix<string, int> g1;
+    SetConsoleOutputCP(CP_UTF8);
+    Graph g(8);  // 假设图有8个顶点（A到H）
 
-// 插入节点，传递字符串作为节点数据
-    g1.insert("A");
-    g1.insert("B");
-    g1.insert("C");
-    g1.insert("D");
-    g1.insert("E");
-    g1.insert("F");
-    g1.insert("G");
-    g1.insert("H");
-    
-    // 插入边
-    g1.insert(4, 1, 0, 1);  // 从节点 0 到节点 1，边的数据是 4，权重是 1
-    g1.insert(6, 2, 0, 3);  // 从节点 0 到节点 3，边的数据是 6，权重是 2
-    g1.insert(12, 3, 0, 2); // 从节点 0 到节点 2，边的数据是 12，权重是 3
-    g1.insert(9, 1, 1, 2);  // 从节点 1 到节点 2，边的数据是 9，权重是 1
-    g1.insert(1, 2, 2, 4);  // 从节点 2 到节点 4，边的数据是 1，权重是 2
-    g1.insert(2, 3, 2, 5);  // 从节点 2 到节点 5，边的数据是 2，权重是 3
-    g1.insert(13, 4, 3, 4); // 从节点 3 到节点 4，边的数据是 13，权重是 4
-    g1.insert(7, 5, 3, 6);  // 从节点 3 到节点 6，边的数据是 7，权重是 5
-    g1.insert(5, 6, 4, 5);  // 从节点 4 到节点 5，边的数据是 5，权重是 6
-    g1.insert(8, 7, 4, 7);  // 从节点 4 到节点 7，边的数据是 8，权重是 7
-    g1.insert(10, 8, 5, 7); // 从节点 5 到节点 7，边的数据是 10，权重是 8
-    g1.insert(14, 9, 6, 7); // 从节点 6 到节点 7，边的数据是 14，权重是 9
-    // 任务1
-    cout << "Graph 1 adjacency matrix:" << endl;
-    g1.printAdjMatrix();
-    
-    // 任务2
-    cout << "\nBFS from A:" << endl;
-    g1.bfs(0);
-    g1.printTraversal();
-    
-    cout << "\nDFS from A:" << endl;
-    g1.dfs(0);
-    g1.printTraversal();
-    
-    // 任务3
- // 在任务3部分，应该这样调用：
-    cout << "\nDijkstra's algorithm from A:" << endl;
-    g1.pfs(0, DijkstraPU<string, int>());
-    g1.printShortestPaths(0);
+    // 添加图 1 的边（图 1 的邻接矩阵）
+    g.addEdge(0, 1, 4);
+    g.addEdge(0, 2, 6);
+    g.addEdge(1, 2, 0);
+    g.addEdge(1, 3, 9);
+    g.addEdge(2, 4, 12);
+    g.addEdge(2, 5, 2);
+    g.addEdge(3, 4, 7);
+    g.addEdge(4, 5, 5);
+    g.addEdge(4, 6, 11);
+    g.addEdge(4, 7, 8);
+    g.addEdge(5, 6, 10);
+    g.addEdge(5, 7, 3);
+    g.addEdge(6, 7, 14);
 
-    cout << "\nPrim's algorithm from A:" << endl;
-    g1.pfs(0, PrimPU<string, int>());
-    g1.printMST();
-    
-    // 任务4
-    cout << "\nBiconnected Components:" << endl;
-    g1.bcc(0);
-    g1.printBCC();
-    
+    // 输出邻接矩阵
+    cout << "图 1 邻接矩阵: " << endl;
+    g.printAdjMatrix();
+    cout << endl;
+
+    // BFS 从 A 点（假设为0号点）
+    cout << "BFS: ";
+    BFS(g, 0);
+    cout << endl;
+
+    // DFS 从 A 点（假设为0号点）
+    cout << "DFS: ";
+    vector<bool> visited(g.V, false);
+    DFS(g, 0, visited);
+    cout << endl;
+
+    // Dijkstra 算法
+    Dijkstra(g, 0);
+
+    // Kruskal 算法
+    Kruskal(g);
+
+    // 计算双连通分量
+    cout << "双连通分量关节点和边: " << endl;
+    findBiconnectedComponents(g);
+
     return 0;
 }

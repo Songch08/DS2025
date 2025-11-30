@@ -1,3 +1,9 @@
+#ifndef GRAPH_H
+#define GRAPH_H
+
+
+
+
 #include <climits>
 #include "Stack.h"
 #include "Queue.h"
@@ -53,3 +59,4 @@ public:
   void dijkstra(int);
   template <typename PU> void pfs(int, PU);
 };
+#endif
