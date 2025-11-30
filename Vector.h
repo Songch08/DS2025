@@ -64,6 +64,7 @@ public:
 
 	void traverse(void (*)(T&));
 	template<typename VST>void traverse(VST&);
+	void resize(Rank newSize, T const& value = T());
 };
 template<typename T>
 void Vector<T>::copyFrom(T const* A, Rank lo, Rank hi) {
@@ -238,4 +239,18 @@ void Vector<T>::merge(Rank lo, Rank mi, Rank hi) {
 
     delete[] B;
 }
+
+template <typename T>
+void Vector<T>::resize(Rank newSize, T const& value) {
+    if (newSize > _capacity) {
+        // 扩展容量
+        expand();
+    }
+    // 赋值
+    while (_size < newSize) {
+        _elem[_size++] = value;  // 填充新位置
+    }
+    _size = newSize;  // 如果新大小小于原大小，直接更新
+}
+
 #endif

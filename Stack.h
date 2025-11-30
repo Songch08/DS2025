@@ -1,5 +1,6 @@
 #include "Vector.h"
-
+#ifndef STACK_H
+#define STACK_H
 template<typename T>
 class Stack : public Vector<T> {
 public:
@@ -7,3 +8,4 @@ public:
     T pop() { return this->remove(this->size() - 1); }
     T& top() { return (*this)[this->size() - 1]; }
 };
+#endif
