@@ -1,14 +1,11 @@
 #include <cstdio>
 #include <cstring>
 #include <cctype>
-
 #include "../BinTree.h"
 #include "../BinNode.h"
-
 #include "../List.h"
 #include "../Bitmap.h"
 #include "../HashTable.h"  
-
 struct HuffChar {
     char ch;
     int weight;
@@ -16,34 +13,25 @@ struct HuffChar {
     bool operator<(const HuffChar& hc) const { return weight > hc.weight; }
     bool operator==(const HuffChar& hc) const { return weight == hc.weight; }
 };
-
-
 #define HuffTree BinTree<HuffChar>
-
 typedef List<HuffTree*> HuffForest;
 typedef Bitmap HuffCode;
 typedef HashTable<char, char*> HuffTable;
-
 #define N_CHAR  (0x80 - 0x20)
-
 int* statistics(char* sample_text_file) {
     int* freq = new int[N_CHAR];
     memset(freq, 0, sizeof(int) * N_CHAR);
-
     FILE* fp = fopen(sample_text_file, "r");
     if (!fp) {
         printf("Cannot open file: %s\n", sample_text_file);
+        freq[0] = -1;
         return freq;
     }
-
     for (char ch; fscanf(fp, "%c", &ch) > 0; )
         if (ch >= 0x20) freq[(unsigned char)ch - 0x20]++;
-
     fclose(fp);
     return freq;
 }
-
-
 HuffForest* initForest(int* freq) {
     HuffForest* forest = new HuffForest;
     for (int i = 0; i < N_CHAR; i++) {
@@ -53,13 +41,10 @@ HuffForest* initForest(int* freq) {
     }
     return forest;
 }
-
-
 HuffTree* minHChar(HuffForest* forest) {
     auto p = forest->first();
     auto minNode = p;
     int minWeight = p->data->root()->data.weight;
-
     while (forest->valid(p = p->succ)) {
         int w = p->data->root()->data.weight;
         if (w < minWeight) {
@@ -69,25 +54,20 @@ HuffTree* minHChar(HuffForest* forest) {
     }
     return forest->remove(minNode);
 }
-
 HuffTree* generateTree(HuffForest* forest) {
     while (forest->size() > 1) {            
         HuffTree* T1 = minHChar(forest);
         HuffTree* T2 = minHChar(forest);
-
         HuffTree* S = new HuffTree;
         S->insertAsRoot(
             HuffChar('^', T1->root()->data.weight + T2->root()->data.weight)
         );
         S->attachAsLC(S->root(), T1);
         S->attachAsRC(S->root(), T2);
-
         forest->insertAsLast(S);
     }
     return forest->first()->data;
 }
-
-
 static void generateCT(Bitmap* code, int length,
                        HuffTable* table, BinNodePosi(HuffChar) v)
 {
@@ -95,46 +75,34 @@ static void generateCT(Bitmap* code, int length,
         table->put(v->data.ch, code->bits2string(length));
         return;
     }
-
     if (HasLChild(*v)) {
         code->clear(length);
         generateCT(code, length+1, table, v->lc);
     }
-
     if (HasRChild(*v)) {
         code->set(length);
         generateCT(code, length+1, table, v->rc);
     }
 }
-
-
 HuffTable* generateTable(HuffTree* tree) {
     HuffTable* table = new HuffTable;
     Bitmap* code = new Bitmap;
-
     generateCT(code, 0, table, tree->root());
-
     delete code;
     return table;
 }
-
-
 int encode(HuffTable* table, Bitmap* codeString, char* s) {
     int n = 0;
-
     for (size_t i = 0, m = strlen(s); i < m; i++) {
         char ch = s[i];
         char** pCode = table->get(ch);
-
         if (!pCode && isalpha((unsigned char)ch)) {
             char ch2 = islower((unsigned char)ch) ? toupper((unsigned char)ch) : tolower((unsigned char)ch);
             pCode = table->get(ch2);
         }
-
         if (!pCode) pCode = table->get(' ');  
         if (pCode) {
             printf("%s", *pCode);
-
             size_t L = strlen(*pCode);
             for (size_t j = 0; j < L; j++) {
                 if ((*pCode)[j] == '1') codeString->set(n++);
@@ -143,17 +111,12 @@ int encode(HuffTable* table, Bitmap* codeString, char* s) {
         }
     }
     printf("\n");
-
     return n;
 }
-
-
 void decode(HuffTree* tree, Bitmap* code, int n) {
     BinNodePosi(HuffChar) x = tree->root();
-
     for (int i = 0; i < n; i++) {
         x = code->test(i) ? x->rc : x->lc;
-
         if (IsLeaf(*x)) {
             printf("%c", x->data.ch);
             x = tree->root();
@@ -161,36 +124,68 @@ void decode(HuffTree* tree, Bitmap* code, int n) {
     }
     printf("\n");
 }
-
-
-int main(int argc, char* argv[]) {
-
-    if (argc < 3) {
-        printf("Usage: huffman textFile word1 [word2 ...]\n");
+int encodeFile(HuffTable* table, Bitmap* codeString, char* filename) {
+    int n = 0;
+    FILE* fp = fopen(filename, "r");
+    if (!fp) {
+        printf("Cannot open file for encoding: %s\n", filename);
         return 0;
     }
+    char ch;
+    while (fscanf(fp, "%c", &ch) > 0) {
+        char** pCode = table->get(ch);
 
-    int* freq = statistics(argv[1]);
-
+        if (!pCode && isalpha((unsigned char)ch)) {
+            char ch2 = islower((unsigned char)ch) ? toupper((unsigned char)ch) : tolower((unsigned char)ch);
+            pCode = table->get(ch2);
+        }
+        if (!pCode) pCode = table->get(' ');
+        if (pCode) {
+            printf("%s", *pCode);
+            size_t L = strlen(*pCode);
+            for (size_t j = 0; j < L; j++) {
+                if ((*pCode)[j] == '1') codeString->set(n++);
+                else codeString->clear(n++);
+            }
+            if (n % 80 >= 80 - (int)L) printf("\n");
+        }
+    }
+    printf("\n");
+    fclose(fp);
+    return n;
+}int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: huffman textFile [word1 word2 ...]\n");
+        return 0;
+    }
+    char* textFile = argv[1];
+    int* freq = statistics(textFile);
+    if (freq[0] == -1) { 
+        printf("Failed to read frequency statistics\n");
+        delete[] freq;
+        return -1;
+    }
     HuffForest* forest = initForest(freq);
     delete[] freq;
-
     HuffTree* tree = generateTree(forest);
     delete forest;
-
     HuffTable* table = generateTable(tree);
 
-    for (int i = 2; i < argc; i++) {
+    if (argc > 2) {
+        for (int i = 2; i < argc; i++) {
+            Bitmap* codeString = new Bitmap;
+            int n = encode(table, codeString, argv[i]);
+            decode(tree, codeString, n);
+            delete codeString;
+        }
+    } 
+    else {
         Bitmap* codeString = new Bitmap;
-
-        int n = encode(table, codeString, argv[i]);
-        decode(tree, codeString, n);
-
+        int n = encodeFile(table, codeString, textFile);
+        printf("Encoded %d bits total\n", n);
         delete codeString;
     }
-
     delete table;
     delete tree;
-
     return 0;
 }
