@@ -153,7 +153,8 @@ int encodeFile(HuffTable* table, Bitmap* codeString, char* filename) {
     printf("\n");
     fclose(fp);
     return n;
-}int main(int argc, char* argv[]) {
+}
+int main(int argc, char* argv[]) {
     if (argc < 2) {
         printf("Usage: huffman textFile [word1 word2 ...]\n");
         return 0;
