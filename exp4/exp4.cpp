@@ -11,7 +11,7 @@
 
 // 1. 排序算法
 
-// 快速排序
+// 1.1快速排序
 template <typename T>
 int partition(std::vector<T>& arr, int low, int high) {
     T pivot = arr[high];  // 选取最后一个元素作为枢轴
@@ -35,7 +35,7 @@ void quicksort(std::vector<T>& arr, int low, int high) {
     }
 }
 
-// 前向声明
+// 1.2归并排序
 template <typename Iter, typename OutIter>
 void merge_sort_impl(Iter first, Iter last, OutIter tmp);
 
@@ -77,7 +77,7 @@ void merge_sort(std::vector<T>& arr)
     merge_sort_impl(arr.begin(), arr.end(), tmp.begin());
 }
 //===================================================
-// 起泡排序
+// 1.3起泡排序
 template <typename T>
 void bubble_sort(std::vector<T>& arr) {
     int n = arr.size();
@@ -93,7 +93,7 @@ void bubble_sort(std::vector<T>& arr) {
     }
 }
 
-// 插入排序
+// 1.4插入排序
 template <typename T>
 void insertion_sort(std::vector<T>& arr) {
     int n = arr.size();
