@@ -1,3 +1,4 @@
+#define NOMINMAX        // 告诉 Windows.h 别定义 min/max 宏
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -5,6 +6,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <iterator> 
+#include <chrono> 
 #include <windows.h> 
 
 // 1. 排序算法
@@ -169,49 +171,57 @@ std::vector<Box> generate_data(int num_boxes, bool clustered = false) {
     }
     return boxes;
 }
-
-// 4. 性能测试
+// 4. 性能测试（微秒版）
 void test_sorting_algorithms() {
     srand(time(0));
 
     std::vector<int> sizes = {100, 1000, 5000, 10000};
-    bool distributions[] = {false, true};  // false: random, true: clustered
+    bool distributions[] = {false, true};
 
     for (int size : sizes) {
         for (bool dist : distributions) {
-            std::cout << "测试 " << (dist ? "聚集" : "随机") << " 分布，" << size << " 个边界框" << std::endl;
+            std::cout << "测试 " << (dist ? "聚集" : "随机") << " 分布，"
+                      << size << " 个边界框" << std::endl;
             std::vector<Box> data = generate_data(size, dist);
 
-            // 测试 NMS
-            clock_t start_time = clock();
+            // NMS
+            auto t0 = std::chrono::steady_clock::now();
             std::vector<Box> nms_result = nms(data);
-            std::cout << "NMS 执行时间: " << (double)(clock() - start_time) / CLOCKS_PER_SEC << " 秒" << std::endl;
+            auto t1 = std::chrono::steady_clock::now();
+            auto ns = std::chrono::duration<double, std::micro>(t1 - t0).count();
+            std::cout << "NMS 执行时间: " << ns << " μs" << std::endl;
 
-            // 测试排序算法
+            // 提取置信度
             std::vector<float> confidences;
-            for (const auto& box : data) {
-                confidences.push_back(box.confidence);
-            }
+            for (const auto& box : data) confidences.push_back(box.confidence);
 
             // 快速排序
-            start_time = clock();
+            t0 = std::chrono::steady_clock::now();
             quicksort(confidences, 0, confidences.size() - 1);
-            std::cout << "快速排序 执行时间: " << (double)(clock() - start_time) / CLOCKS_PER_SEC << " 秒" << std::endl;
+            t1 = std::chrono::steady_clock::now();
+            ns = std::chrono::duration<double, std::micro>(t1 - t0).count();
+            std::cout << "快速排序 执行时间: " << ns << " μs" << std::endl;
 
             // 归并排序
-            start_time = clock();
+            t0 = std::chrono::steady_clock::now();
             merge_sort(confidences);
-            std::cout << "归并排序 执行时间: " << (double)(clock() - start_time) / CLOCKS_PER_SEC << " 秒" << std::endl;
+            t1 = std::chrono::steady_clock::now();
+            ns = std::chrono::duration<double, std::micro>(t1 - t0).count();
+            std::cout << "归并排序 执行时间: " << ns << " μs" << std::endl;
 
             // 起泡排序
-            start_time = clock();
+            t0 = std::chrono::steady_clock::now();
             bubble_sort(confidences);
-            std::cout << "起泡排序 执行时间: " << (double)(clock() - start_time) / CLOCKS_PER_SEC << " 秒" << std::endl;
+            t1 = std::chrono::steady_clock::now();
+            ns = std::chrono::duration<double, std::micro>(t1 - t0).count();
+            std::cout << "起泡排序 执行时间: " << ns << " μs" << std::endl;
 
             // 插入排序
-            start_time = clock();
+            t0 = std::chrono::steady_clock::now();
             insertion_sort(confidences);
-            std::cout << "插入排序 执行时间: " << (double)(clock() - start_time) / CLOCKS_PER_SEC << " 秒" << std::endl;
+            t1 = std::chrono::steady_clock::now();
+            ns = std::chrono::duration<double, std::micro>(t1 - t0).count();
+            std::cout << "插入排序 执行时间: " << ns << " μs" << std::endl;
         }
     }
 }
