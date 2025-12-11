@@ -218,8 +218,7 @@ void Vector<T>::merge(Rank lo, Rank mi, Rank hi) {
     T* A = _elem + lo;
     int lb = mi - lo;
     T* B = new T[lb];
-    
-    // 拷贝左半部分到 B 中
+
     for (Rank i = 0; i < lb; ++i) {
         B[i] = A[i];
     }
@@ -227,7 +226,7 @@ void Vector<T>::merge(Rank lo, Rank mi, Rank hi) {
     int lc = hi - mi;
     T* C = _elem + mi;
 
-    // 合并操作
+
     Rank i = 0, j = 0, k = 0;
     while (j < lb || k < lc) {
         if (j < lb && (k >= lc || B[j] <= C[k])) {
@@ -243,14 +242,14 @@ void Vector<T>::merge(Rank lo, Rank mi, Rank hi) {
 template <typename T>
 void Vector<T>::resize(Rank newSize, T const& value) {
     if (newSize > _capacity) {
-        // 扩展容量
+
         expand();
     }
-    // 赋值
+
     while (_size < newSize) {
-        _elem[_size++] = value;  // 填充新位置
+        _elem[_size++] = value;  
     }
-    _size = newSize;  // 如果新大小小于原大小，直接更新
+    _size = newSize;  
 }
 
 #endif
